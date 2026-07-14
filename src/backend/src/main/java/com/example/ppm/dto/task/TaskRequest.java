@@ -1,0 +1,1 @@
+package com.example.ppm.dto.task; import jakarta.validation.constraints.NotBlank; import java.time.LocalDateTime; import java.util.List; public record TaskRequest(@NotBlank(message="任务名称不能为空")String title,Long projectId,String type,String priority,LocalDateTime planStartAt,LocalDateTime dueAt,String description,List<Long> attachmentIds){}

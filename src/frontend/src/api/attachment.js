@@ -1,0 +1,1 @@
+import client from './client'; export const uploadAttachment=(file,kind)=>{const f=new FormData();f.append('file',file);if(kind)f.append('kind',kind);return client.post('/attachments',f)};export const taskAttachments=id=>client.get(`/tasks/${id}/attachments`);export const deleteAttachment=id=>client.delete(`/attachments/${id}`)

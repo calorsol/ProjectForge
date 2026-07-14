@@ -1,0 +1,40 @@
+# Java / Maven
+src/backend/target/
+*.class
+.m2/
+
+# Node / Vite
+src/frontend/node_modules/
+src/frontend/dist/
+*.tsbuildinfo
+
+# Runtime data and uploads
+uploads/
+src/backend/uploads/
+*.db
+*.sqlite
+*.sqlite3
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+src/backend/src/main/resources/application-local.yml
+src/frontend/.env.local
+src/frontend/.env.*.local
+
+# Logs and process output
+*.log
+*.log.*
+backend-error.log
+frontend-error.log
+
+# IDE and operating-system files
+.idea/
+.vscode/
+*.iml
+.classpath
+.project
+.settings/
+.DS_Store
+Thumbs.db
