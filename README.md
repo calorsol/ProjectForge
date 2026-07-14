@@ -20,6 +20,16 @@
 | 前端 | Vue 3、Vite、Element Plus、Pinia、Axios、wangEditor |
 | 文件存储 | 本地磁盘 `uploads/yyyy/MM`，通过 `/uploads/**` 访问 |
 
+## 页面效果
+
+| 登录 | 工作台 |
+| --- | --- |
+| ![登录页](docs/images/login.png) | ![工作台](docs/images/workbench.png) |
+
+| 项目管理 | 成员管理 |
+| --- | --- |
+| ![项目管理](docs/images/projects.png) | ![成员管理](docs/images/members.png) |
+
 ## 目录
 
 ```text
