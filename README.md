@@ -119,3 +119,7 @@ Authorization: Bearer <token>
 - 本地数据库密码使用 `DB_USERNAME` / `DB_PASSWORD` 环境变量。
 - `.gitignore` 已排除构建产物、依赖目录、日志、上传文件、数据库文件、本地配置和 IDE 配置。
 - 请勿提交密码、JWT、私钥或真实服务器配置。
+
+## 部署
+
+`deploy/` 提供生产环境 Docker Compose 和 Nginx HTTP 站点配置。生产前端通过同域 `/api` 调用后端；真实密码仅保存在服务器的 `deploy/.env`，可参考 `deploy/.env.example` 创建。

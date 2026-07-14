@@ -22,6 +22,7 @@ src/backend/uploads/
 src/backend/src/main/resources/application-local.yml
 src/frontend/.env.local
 src/frontend/.env.*.local
+deploy/.env
 
 # Logs and process output
 *.log
