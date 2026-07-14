@@ -32,6 +32,7 @@ frontend-error.log
 # IDE and operating-system files
 .idea/
 .vscode/
+.playwright-cli/
 *.iml
 .classpath
 .project
