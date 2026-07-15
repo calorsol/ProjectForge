@@ -4,6 +4,7 @@ import Login from '../views/Login.vue'
 import Workbench from '../views/Workbench.vue'
 import Projects from '../views/Projects.vue'
 import ProjectDetail from '../views/ProjectDetail.vue'
+import TaskDetail from '../views/TaskDetail.vue'
 import Members from '../views/Members.vue'
 
 const router = createRouter({ history: createWebHistory(), routes: [
@@ -11,6 +12,7 @@ const router = createRouter({ history: createWebHistory(), routes: [
   { path: '/', component: Workbench },
   { path: '/projects', component: Projects },
   { path: '/projects/:id', component: ProjectDetail },
+  { path: '/tasks/:id', component: TaskDetail },
   { path: '/members', component: Members, meta: { admin: true } },
   { path: '/:pathMatch(.*)*', redirect: '/' }
 ] })

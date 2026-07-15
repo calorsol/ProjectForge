@@ -27,6 +27,13 @@ CREATE TABLE IF NOT EXISTS task (
   INDEX idx_owner (owner_id), INDEX idx_project (project_id), INDEX idx_status (status)
 );
 
+CREATE TABLE IF NOT EXISTS task_note (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT, task_id BIGINT NOT NULL, author_id BIGINT NOT NULL,
+  author_name VARCHAR(50) NULL, content LONGTEXT NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, deleted TINYINT NOT NULL DEFAULT 0,
+  INDEX idx_task (task_id)
+);
+
 CREATE TABLE IF NOT EXISTS attachment (
   id BIGINT PRIMARY KEY AUTO_INCREMENT, task_id BIGINT NULL, kind VARCHAR(10) NOT NULL DEFAULT 'FILE',
   file_name VARCHAR(255) NOT NULL, file_path VARCHAR(500) NOT NULL, url VARCHAR(500) NOT NULL,

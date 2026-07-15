@@ -47,7 +47,7 @@ onMounted(load)
         <el-button @click="router.push('/projects')">返回项目列表</el-button>
         <el-button type="primary" @click="openNew">＋ 新建任务</el-button>
       </div>
-      <TaskTable :rows="rows" :show-project="false" @action="act" @edit="openEdit" @delete="remove" />
+      <TaskTable :rows="rows" :show-project="false" @action="act" @edit="openEdit" @delete="remove" @open="row => router.push('/tasks/' + row.id)" />
     </el-card>
     <TaskModal v-model="dialog" :task="editing" @saved="load" />
   </main>

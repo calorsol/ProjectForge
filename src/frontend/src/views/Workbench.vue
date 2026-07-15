@@ -1,11 +1,13 @@
 <script setup>
 import { onMounted, ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { changeStatus, workbenchTasks, deleteTask } from '../api/task'
 import { listProjects } from '../api/project'
 import TaskTable from '../components/TaskTable.vue'
 import TaskModal from '../components/TaskModal.vue'
 
+const router = useRouter()
 const tab = ref('todo')
 const rows = ref([])
 const projects = ref([])
@@ -68,7 +70,7 @@ onMounted(async () => { await load(); projects.value = await listProjects() })
         <span class="spacer" />
         <el-button type="primary" @click="openNew">＋ 新建任务</el-button>
       </div>
-      <TaskTable :rows="filteredRows" @action="act" @edit="openEdit" @delete="remove" />
+      <TaskTable :rows="filteredRows" @action="act" @edit="openEdit" @delete="remove" @open="row => router.push('/tasks/' + row.id)" />
     </el-card>
     <TaskModal v-model="dialog" :task="editing" @saved="load" />
   </main>
