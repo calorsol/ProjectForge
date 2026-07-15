@@ -2,9 +2,9 @@
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getTask, getTaskHistory, changeStatus } from '../api/task'
+import { getTask, getTaskHistory, changeStatus, updateTask } from '../api/task'
 import { taskAttachments, uploadAttachment, deleteAttachment } from '../api/attachment'
-import { listNotes, addNote, deleteNote } from '../api/note'
+import { listNotes, addNote, updateNote, deleteNote } from '../api/note'
 import { taskStatusLabel, taskStatusType, priorityLabel, priorityType } from '../utils/dict'
 import { BACKEND_ORIGIN } from '../api/client'
 import RichEditor from '../components/RichEditor.vue'
@@ -23,6 +23,10 @@ const bottomTab = ref('notes')
 const adding = ref(false)
 const draft = ref('')
 const dialog = ref(false)
+const editingNoteId = ref(null)   // 正在编辑的备注 id
+const editDraft = ref('')
+const descEditing = ref(false)    // 描述是否处于编辑态
+const descDraft = ref('')
 
 const load = async () => {
   task.value = await getTask(taskId)
@@ -40,6 +44,38 @@ const submitNote = async () => {
   await addNote(taskId, draft.value)
   draft.value = ''; adding.value = false
   ElMessage.success('备注已添加'); load()
+}
+// 直接在详情页就地编辑任务描述（不必打开编辑弹窗）
+const startEditDesc = () => {
+  descDraft.value = task.value.description || ''
+  descEditing.value = true
+  if (!descOpen.value.includes('desc')) descOpen.value.push('desc')
+}
+const cancelEditDesc = () => { descEditing.value = false; descDraft.value = '' }
+const saveDesc = async () => {
+  const t = task.value
+  try {
+    await updateTask(taskId, {
+      title: t.title, projectId: t.projectId, type: t.type, priority: t.priority,
+      planStartAt: t.planStartAt, dueAt: t.dueAt, description: descDraft.value,
+      attachmentIds: files.value.map(f => f.id)
+    })
+    ElMessage.success('描述已保存'); cancelEditDesc(); load()
+  } catch (e) { ElMessage.error(e.message) }
+}
+
+const startEditNote = n => {
+  editingNoteId.value = n.id
+  editDraft.value = n.content
+  if (!expanded.value.includes(n.id)) expanded.value.push(n.id)   // 编辑时确保展开
+}
+const cancelEditNote = () => { editingNoteId.value = null; editDraft.value = '' }
+const saveNote = async n => {
+  if (!plain(editDraft.value)) { ElMessage.warning('备注内容不能为空'); return }
+  try {
+    await updateNote(n.id, editDraft.value)
+    ElMessage.success('备注已更新'); cancelEditNote(); load()
+  } catch (e) { ElMessage.error(e.message) }
 }
 const removeNote = async n => {
   try { await ElMessageBox.confirm('确认删除这条备注？', '提示', { type: 'warning' }) } catch { return }
@@ -80,9 +116,21 @@ onMounted(load)
         <el-card class="page-card">
           <el-collapse v-model="descOpen">
             <el-collapse-item name="desc">
-              <template #title><span class="sec-title-inline">任务描述</span></template>
-              <div v-if="plain(task.description)" class="rich-content" v-html="task.description" />
-              <span v-else class="muted">暂无描述</span>
+              <template #title>
+                <span class="sec-title-inline">任务描述</span>
+                <el-button v-if="!descEditing" link type="primary" style="margin-left:12px" @click.stop="startEditDesc">编辑</el-button>
+              </template>
+              <div v-if="descEditing">
+                <RichEditor v-model="descDraft" height="300px" />
+                <div style="margin-top:8px; text-align:right">
+                  <el-button @click="cancelEditDesc">取消</el-button>
+                  <el-button type="primary" @click="saveDesc">保存</el-button>
+                </div>
+              </div>
+              <template v-else>
+                <div v-if="plain(task.description)" class="rich-content" v-html="task.description" />
+                <span v-else class="muted">暂无描述，点击上方「编辑」添加</span>
+              </template>
             </el-collapse-item>
           </el-collapse>
         </el-card>
@@ -122,10 +170,21 @@ onMounted(load)
                   <template #title>
                     <span class="note-head"><b>{{ n.authorName }}</b><span class="note-time">{{ n.createdAt }}</span></span>
                   </template>
-                  <div class="rich-content" v-html="n.content" />
-                  <div style="text-align:right">
-                    <el-button link type="danger" @click="removeNote(n)">删除该备注</el-button>
+                  <!-- 编辑中显示富文本编辑器，否则渲染正文 -->
+                  <div v-if="editingNoteId === n.id">
+                    <RichEditor v-model="editDraft" height="200px" />
+                    <div style="margin-top:8px; text-align:right">
+                      <el-button @click="cancelEditNote">取消</el-button>
+                      <el-button type="primary" @click="saveNote(n)">保存</el-button>
+                    </div>
                   </div>
+                  <template v-else>
+                    <div class="rich-content" v-html="n.content" />
+                    <div style="text-align:right">
+                      <el-button link type="primary" @click="startEditNote(n)">编辑</el-button>
+                      <el-button link type="danger" @click="removeNote(n)">删除该备注</el-button>
+                    </div>
+                  </template>
                 </el-collapse-item>
               </el-collapse>
               <span v-else class="muted">暂无备注</span>

@@ -38,6 +38,15 @@ public class NoteService {
         return out(mapper.selectById(n.getId()));
     }
 
+    public NoteResponse update(Long uid, Long id, String content) {
+        TaskNote n = mapper.selectById(id);
+        if (n == null) throw new BusinessException(404, "备注不存在");
+        requireOwnTask(uid, n.getTaskId());
+        n.setContent(content);
+        mapper.updateById(n);
+        return out(mapper.selectById(id));
+    }
+
     public void remove(Long uid, Long id) {
         TaskNote n = mapper.selectById(id);
         if (n == null) throw new BusinessException(404, "备注不存在");

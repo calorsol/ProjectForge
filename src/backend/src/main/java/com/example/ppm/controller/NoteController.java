@@ -26,6 +26,11 @@ public class NoteController {
         return R.ok(service.add(u.userId(), u.username(), id, r.content()));
     }
 
+    @PutMapping("/api/notes/{id}")
+    public R<NoteResponse> update(@PathVariable Long id, @Valid @RequestBody NoteRequest r) {
+        return R.ok(service.update(me().userId(), id, r.content()));
+    }
+
     @DeleteMapping("/api/notes/{id}")
     public R<Void> remove(@PathVariable Long id) { service.remove(me().userId(), id); return R.ok(); }
 }
