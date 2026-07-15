@@ -27,6 +27,13 @@ CREATE TABLE IF NOT EXISTS task (
   INDEX idx_owner (owner_id), INDEX idx_project (project_id), INDEX idx_status (status)
 );
 
+CREATE TABLE IF NOT EXISTS task_history (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT, task_id BIGINT NOT NULL, user_id BIGINT NULL,
+  user_name VARCHAR(50) NULL, action VARCHAR(50) NOT NULL, detail VARCHAR(1000) NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_task (task_id)
+);
+
 CREATE TABLE IF NOT EXISTS task_note (
   id BIGINT PRIMARY KEY AUTO_INCREMENT, task_id BIGINT NOT NULL, author_id BIGINT NOT NULL,
   author_name VARCHAR(50) NULL, content LONGTEXT NOT NULL,
