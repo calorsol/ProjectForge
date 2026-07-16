@@ -7,8 +7,9 @@ import { taskAttachments, uploadAttachment, deleteAttachment } from '../api/atta
 import { listNotes, addNote, updateNote, deleteNote } from '../api/note'
 import { taskStatusLabel, taskStatusType, priorityLabel, priorityType } from '../utils/dict'
 import { BACKEND_ORIGIN } from '../api/client'
-import RichEditor from '../components/RichEditor.vue'
+import { defineAsyncComponent } from 'vue'
 import TaskModal from '../components/TaskModal.vue'
+const RichEditor = defineAsyncComponent(() => import('../components/RichEditor.vue'))
 
 const route = useRoute()
 const router = useRouter()

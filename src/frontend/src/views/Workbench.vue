@@ -44,7 +44,7 @@ const remove = async row => {
   try { await ElMessageBox.confirm(`确认删除任务「${row.title}」？`, '提示', { type: 'warning' }) } catch { return }
   await deleteTask(row.id); ElMessage.success('已删除'); load()
 }
-onMounted(async () => { await load(); projects.value = await listProjects() })
+onMounted(async () => { const [, projs] = await Promise.all([load(), listProjects()]); projects.value = projs })
 </script>
 
 <template>

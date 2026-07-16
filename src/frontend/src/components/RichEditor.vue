@@ -35,8 +35,8 @@ onBeforeUnmount(() => { editorRef.value?.destroy() })
 </script>
 
 <template>
-  <div style="border:1px solid #dcdfe6; border-radius:4px; width:100%; overflow:hidden;">
-    <Toolbar :editor="editorRef" :default-config="toolbarConfig" mode="default" style="border-bottom:1px solid #e6e8eb;" />
+  <div style="border:1px solid var(--app-border); border-radius:4px; width:100%; overflow:hidden;">
+    <Toolbar :editor="editorRef" :default-config="toolbarConfig" mode="default" style="border-bottom:1px solid var(--app-border);" />
     <Editor v-model="valueHtml" :default-config="editorConfig" mode="default" :style="{ height: height, 'overflow-y': 'auto' }" @on-created="handleCreated" />
   </div>
 </template>

@@ -21,8 +21,15 @@ import java.util.*;
  private final TaskMapper mapper; private final AttachmentService attachments; private final ProjectMapper projectMapper; private final HistoryService historyService;
  public TaskService(TaskMapper mapper,AttachmentService attachments,ProjectMapper projectMapper,HistoryService historyService){this.mapper=mapper;this.attachments=attachments;this.projectMapper=projectMapper;this.historyService=historyService;}
 
- public List<TaskResponse> list(Long uid,String keyword,Long projectId,String type,String status,LocalDateTime from,LocalDateTime to){return mapper.selectList(new LambdaQueryWrapper<Task>().eq(Task::getOwnerId,uid).like(keyword!=null&&!keyword.isBlank(),Task::getTitle,keyword).eq(projectId!=null,Task::getProjectId,projectId).eq(type!=null&&!type.isBlank(),Task::getType,type).eq(status!=null&&!status.isBlank(),Task::getStatus,status).ge(from!=null,Task::getPlanStartAt,from).le(to!=null,Task::getPlanStartAt,to).orderByDesc(Task::getId)).stream().map(this::out).toList();}
- public List<TaskResponse> workbench(Long uid,String tab){List<Task> all=mapper.selectList(new LambdaQueryWrapper<Task>().eq(Task::getOwnerId,uid).orderByDesc(Task::getId));return all.stream().filter(t->switch(tab==null?"todo":tab){case "todo"->Set.of("TODO","DOING").contains(t.getStatus());case "paused"->"PAUSED".equals(t.getStatus());case "done"->"DONE".equals(t.getStatus());case "all"->true;default->false;}).map(this::out).toList();}
+ public List<TaskResponse> list(Long uid,String keyword,Long projectId,String type,String status,LocalDateTime from,LocalDateTime to){return outList(mapper.selectList(new LambdaQueryWrapper<Task>().eq(Task::getOwnerId,uid).like(keyword!=null&&!keyword.isBlank(),Task::getTitle,keyword).eq(projectId!=null,Task::getProjectId,projectId).eq(type!=null&&!type.isBlank(),Task::getType,type).eq(status!=null&&!status.isBlank(),Task::getStatus,status).ge(from!=null,Task::getPlanStartAt,from).le(to!=null,Task::getPlanStartAt,to).orderByDesc(Task::getId)));}
+ public List<TaskResponse> workbench(Long uid,String tab){List<Task> all=mapper.selectList(new LambdaQueryWrapper<Task>().eq(Task::getOwnerId,uid).orderByDesc(Task::getId));List<Task> filtered=all.stream().filter(t->switch(tab==null?"todo":tab){case "todo"->Set.of("TODO","DOING").contains(t.getStatus());case "paused"->"PAUSED".equals(t.getStatus());case "done"->"DONE".equals(t.getStatus());case "all"->true;default->false;}).toList();return outList(filtered);}
+
+ /** 批量输出：一次查出所有涉及的项目名，避免逐条 selectById 的 N+1 查询 */
+ private List<TaskResponse> outList(List<Task> tasks){
+  Set<Long> pids=tasks.stream().map(Task::getProjectId).filter(Objects::nonNull).collect(java.util.stream.Collectors.toSet());
+  Map<Long,String> names=pids.isEmpty()?Map.of():projectMapper.selectBatchIds(pids).stream().collect(java.util.stream.Collectors.toMap(Project::getId,Project::getName,(a,b)->a));
+  return tasks.stream().map(t->out(t,t.getProjectId()==null?"默认项目":names.getOrDefault(t.getProjectId(),"默认项目"))).toList();
+ }
 
  public TaskResponse create(Long uid,TaskRequest r){
   Task t=new Task();t.setOwnerId(uid);t.setStatus("TODO");apply(t,r);mapper.insert(t);
@@ -79,5 +86,6 @@ import java.util.*;
  private String label(Map<String,String> m,String k){return k==null?"空":m.getOrDefault(k,k);}
  private String projectName(Long id){return id==null?"默认项目":Optional.ofNullable(projectMapper.selectById(id)).map(Project::getName).orElse("默认项目");}
 
- private TaskResponse out(Task t){boolean overdue=t.getDueAt()!=null&&t.getDueAt().isBefore(LocalDateTime.now())&&Set.of("TODO","DOING","PAUSED").contains(t.getStatus());String projectName=projectName(t.getProjectId());return new TaskResponse(t.getId(),t.getTitle(),t.getProjectId(),projectName,t.getType(),t.getPriority(),t.getStatus(),t.getPlanStartAt(),t.getDueAt(),overdue,t.getCreatedAt(),t.getFinishedAt(),t.getDescription());}
+ private TaskResponse out(Task t){return out(t,projectName(t.getProjectId()));}
+ private TaskResponse out(Task t,String projectName){boolean overdue=t.getDueAt()!=null&&t.getDueAt().isBefore(LocalDateTime.now())&&Set.of("TODO","DOING","PAUSED").contains(t.getStatus());return new TaskResponse(t.getId(),t.getTitle(),t.getProjectId(),projectName,t.getType(),t.getPriority(),t.getStatus(),t.getPlanStartAt(),t.getDueAt(),overdue,t.getCreatedAt(),t.getFinishedAt(),t.getDescription());}
 }

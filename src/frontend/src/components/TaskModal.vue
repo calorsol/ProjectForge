@@ -1,10 +1,10 @@
 <script setup>
-import { onMounted, reactive, ref, watch } from 'vue'
+import { defineAsyncComponent, onMounted, reactive, ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { createTask, updateTask } from '../api/task'
 import { listProjects } from '../api/project'
 import { uploadAttachment, deleteAttachment, taskAttachments } from '../api/attachment'
-import RichEditor from './RichEditor.vue'
+const RichEditor = defineAsyncComponent(() => import('./RichEditor.vue'))
 
 const props = defineProps({ modelValue: Boolean, task: Object })
 const emit = defineEmits(['update:modelValue', 'saved'])
