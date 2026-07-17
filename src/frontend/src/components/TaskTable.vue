@@ -2,10 +2,21 @@
 import { taskStatusLabel, taskStatusType, priorityLabel, priorityType } from '../utils/dict'
 defineProps({ rows: { type: Array, default: () => [] }, showProject: { type: Boolean, default: true } })
 const emit = defineEmits(['action', 'edit', 'delete', 'open'])
+
+// 行背景：已完成且不晚于截止=提前完成(绿)；逾期(未完成过期 或 完成晚于截止)=红
+const rowClass = ({ row }) => {
+  let cls = 'clickable-row'
+  if (row.status === 'DONE' && row.dueAt && row.finishedAt) {
+    cls += row.finishedAt <= row.dueAt ? ' row-early' : ' row-late'
+  } else if (row.overdue) {
+    cls += ' row-late'
+  }
+  return cls
+}
 </script>
 
 <template>
-  <el-table :data="rows" style="width:100%" border stripe row-class-name="clickable-row" @row-click="row => emit('open', row)">
+  <el-table :data="rows" style="width:100%" border stripe :row-class-name="rowClass" @row-click="row => emit('open', row)">
     <el-table-column prop="title" label="任务名称" min-width="220" show-overflow-tooltip />
     <el-table-column v-if="showProject" prop="projectName" label="所属项目" min-width="140" show-overflow-tooltip />
     <el-table-column prop="type" label="类型" min-width="90" />

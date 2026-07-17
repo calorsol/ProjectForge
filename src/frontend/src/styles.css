@@ -20,6 +20,7 @@ body { margin:0; min-width:360px; background:var(--app-bg); color:var(--app-text
 .login-card h2,.login-sub { text-align:center; } .login-sub { color:var(--app-muted); font-size:13px; margin-bottom:24px; }
 .form-switch { text-align:center; color:var(--app-muted); font-size:13px; margin:16px 0 0; }
 .topbar { height:52px; padding:0 24px; display:flex; align-items:center; color:white; background:linear-gradient(90deg,#2c7be5,#1b64c4); }
+html.dark .topbar { background:linear-gradient(90deg,#202225,#141517); border-bottom:1px solid #2b2c2e; }
 .brand { font-size:16px; font-weight:600; margin-right:30px; }
 .topnav { display:flex; gap:8px; } .topnav a { color:#dbe8fb; text-decoration:none; padding:6px 16px; border-radius:4px; }
 .topnav a.router-link-active { color:white; background:rgba(255,255,255,.18); }
@@ -28,6 +29,15 @@ body { margin:0; min-width:360px; background:var(--app-bg); color:var(--app-text
 .breadcrumb { display:flex; align-items:center; gap:8px; margin-bottom:14px; font-size:14px; }
 .breadcrumb a { color:var(--app-accent); cursor:pointer; text-decoration:none; } .breadcrumb .sep { color:var(--app-muted); }
 .el-table .clickable-row { cursor:pointer; }
+/* 任务行状态着色：提前完成=绿，逾期=红（覆盖斑马纹） */
+.el-table .el-table__body tr.row-early > td.el-table__cell { background-color:#e6f8ea !important; }
+.el-table .el-table__body tr.row-early:hover > td.el-table__cell { background-color:#d7f2de !important; }
+.el-table .el-table__body tr.row-late > td.el-table__cell { background-color:#fdeaea !important; }
+.el-table .el-table__body tr.row-late:hover > td.el-table__cell { background-color:#fbdcdc !important; }
+html.dark .el-table .el-table__body tr.row-early > td.el-table__cell { background-color:#1c3626 !important; }
+html.dark .el-table .el-table__body tr.row-early:hover > td.el-table__cell { background-color:#244731 !important; }
+html.dark .el-table .el-table__body tr.row-late > td.el-table__cell { background-color:#3a2020 !important; }
+html.dark .el-table .el-table__body tr.row-late:hover > td.el-table__cell { background-color:#4a2727 !important; }
 .detail-head { display:flex; align-items:center; gap:12px; background:var(--app-surface); border:1px solid var(--app-border); border-radius:8px; padding:12px 16px; margin-bottom:16px; flex-wrap:wrap; }
 .detail-head .tid { background:var(--app-chip-bg); color:var(--app-muted); padding:2px 8px; border-radius:4px; font-size:12px; }
 .detail-head .ttitle { font-size:16px; font-weight:600; }
