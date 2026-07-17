@@ -136,34 +136,23 @@ onMounted(load)
           </el-collapse>
         </el-card>
 
-        <!-- 附件：没有附件时只留一个小上传按钮 -->
+        <!-- 备注 / 历史记录 / 附件信息：操作按钮统一放在右上角 -->
         <el-card class="page-card" style="margin-top:16px">
-          <div class="sec-title">
-            附件信息
-            <el-upload :auto-upload="false" :show-file-list="false" multiple style="float:right" @change="uploadFile">
-              <el-button size="small">＋ 上传附件</el-button>
-            </el-upload>
-          </div>
-          <div v-if="files.length">
-            <div v-for="f in files" :key="f.id" class="file-row">
-              <a :href="fileUrl(f)" target="_blank" class="file-link">📎 {{ f.fileName }}</a>
-              <el-button link type="danger" size="small" @click="removeFile(f)">删除</el-button>
+          <div class="tabs-wrap">
+            <div class="tabs-actions">
+              <el-button v-if="bottomTab === 'notes' && !adding" link type="primary" @click="adding = true">＋ 添加备注</el-button>
+              <el-button v-if="bottomTab === 'notes' && adding" link @click="adding = false; draft = ''">取消添加</el-button>
+              <el-upload v-if="bottomTab === 'files'" :auto-upload="false" :show-file-list="false" multiple @change="uploadFile">
+                <el-button link type="primary">＋ 上传附件</el-button>
+              </el-upload>
             </div>
-          </div>
-        </el-card>
-
-        <!-- 备注 + 历史记录 -->
-        <el-card class="page-card" style="margin-top:16px">
-          <el-tabs v-model="bottomTab">
+            <el-tabs v-model="bottomTab">
             <el-tab-pane label="备注" name="notes">
-              <div style="margin-bottom:12px">
-                <el-button v-if="!adding" link type="primary" @click="adding = true">＋ 添加备注</el-button>
-                <div v-else>
-                  <RichEditor v-model="draft" height="200px" />
-                  <div style="margin-top:8px; text-align:right">
-                    <el-button @click="adding = false; draft = ''">取消</el-button>
-                    <el-button type="primary" @click="submitNote">提交备注</el-button>
-                  </div>
+              <div v-if="adding" style="margin-bottom:12px">
+                <RichEditor v-model="draft" height="200px" />
+                <div style="margin-top:8px; text-align:right">
+                  <el-button @click="adding = false; draft = ''">取消</el-button>
+                  <el-button type="primary" @click="submitNote">提交备注</el-button>
                 </div>
               </div>
               <el-collapse v-if="notes.length" v-model="expanded">
@@ -201,7 +190,18 @@ onMounted(load)
               </ol>
               <span v-else class="muted">暂无历史记录</span>
             </el-tab-pane>
-          </el-tabs>
+
+            <el-tab-pane :label="`附件信息 (${files.length})`" name="files">
+              <div v-if="files.length">
+                <div v-for="f in files" :key="f.id" class="file-row">
+                  <a :href="fileUrl(f)" target="_blank" class="file-link">📎 {{ f.fileName }}</a>
+                  <el-button link type="danger" size="small" @click="removeFile(f)">删除</el-button>
+                </div>
+              </div>
+              <span v-else class="muted">暂无附件，点击右上角「上传附件」添加</span>
+            </el-tab-pane>
+            </el-tabs>
+          </div>
         </el-card>
       </div>
 
