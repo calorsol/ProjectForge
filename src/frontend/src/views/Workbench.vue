@@ -6,6 +6,7 @@ import { changeStatus, workbenchTasks, deleteTask } from '../api/task'
 import { listProjects } from '../api/project'
 import TaskTable from '../components/TaskTable.vue'
 import TaskModal from '../components/TaskModal.vue'
+import FinishDialog from '../components/FinishDialog.vue'
 
 const router = useRouter()
 const tab = ref('todo')
@@ -13,6 +14,8 @@ const rows = ref([])
 const projects = ref([])
 const dialog = ref(false)
 const editing = ref(null)
+const finishDialog = ref(false)
+const finishTarget = ref(null)
 
 // 筛选条件
 const fKeyword = ref('')
@@ -35,6 +38,7 @@ const filteredRows = computed(() => rows.value.filter(r => {
 }))
 
 const act = async (row, action) => {
+  if (action === 'finish') { finishTarget.value = row; finishDialog.value = true; return }
   try { await changeStatus(row.id, action); ElMessage.success('操作成功'); load() }
   catch (e) { ElMessage.error(e.message) }
 }
@@ -73,5 +77,6 @@ onMounted(async () => { const [, projs] = await Promise.all([load(), listProject
       <TaskTable :rows="filteredRows" @action="act" @edit="openEdit" @delete="remove" @open="row => router.push('/tasks/' + row.id)" />
     </el-card>
     <TaskModal v-model="dialog" :task="editing" @saved="load" />
+    <FinishDialog v-model="finishDialog" :task-id="finishTarget?.id" :task-title="finishTarget?.title" @finished="load" />
   </main>
 </template>

@@ -9,6 +9,7 @@ import { taskStatusLabel, taskStatusType, priorityLabel, priorityType } from '..
 import { BACKEND_ORIGIN } from '../api/client'
 import { defineAsyncComponent } from 'vue'
 import TaskModal from '../components/TaskModal.vue'
+import FinishDialog from '../components/FinishDialog.vue'
 const RichEditor = defineAsyncComponent(() => import('../components/RichEditor.vue'))
 
 const route = useRoute()
@@ -24,6 +25,7 @@ const bottomTab = ref('notes')
 const adding = ref(false)
 const draft = ref('')
 const dialog = ref(false)
+const finishDialog = ref(false)
 const editingNoteId = ref(null)   // 正在编辑的备注 id
 const editDraft = ref('')
 const descEditing = ref(false)    // 描述是否处于编辑态
@@ -37,6 +39,7 @@ const load = async () => {
   expanded.value = notes.value.map(n => n.id)
 }
 const act = async action => {
+  if (action === 'finish') { finishDialog.value = true; return }
   try { await changeStatus(taskId, action); ElMessage.success('操作成功'); load() }
   catch (e) { ElMessage.error(e.message) }
 }
@@ -225,5 +228,6 @@ onMounted(load)
     </div>
 
     <TaskModal v-model="dialog" :task="task" @saved="load" />
+    <FinishDialog v-model="finishDialog" :task-id="taskId" :task-title="task.title" @finished="load" />
   </main>
 </template>

@@ -6,6 +6,7 @@ import { getProject } from '../api/project'
 import { listTasks, changeStatus, deleteTask } from '../api/task'
 import TaskTable from '../components/TaskTable.vue'
 import TaskModal from '../components/TaskModal.vue'
+import FinishDialog from '../components/FinishDialog.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -14,12 +15,15 @@ const project = ref(null)
 const rows = ref([])
 const dialog = ref(false)
 const editing = ref(null)
+const finishDialog = ref(false)
+const finishTarget = ref(null)
 
 const load = async () => {
   project.value = await getProject(projectId)
   rows.value = await listTasks({ projectId })
 }
 const act = async (row, action) => {
+  if (action === 'finish') { finishTarget.value = row; finishDialog.value = true; return }
   try { await changeStatus(row.id, action); ElMessage.success('操作成功'); load() }
   catch (e) { ElMessage.error(e.message) }
 }
@@ -50,5 +54,6 @@ onMounted(load)
       <TaskTable :rows="rows" :show-project="false" @action="act" @edit="openEdit" @delete="remove" @open="row => router.push('/tasks/' + row.id)" />
     </el-card>
     <TaskModal v-model="dialog" :task="editing" @saved="load" />
+    <FinishDialog v-model="finishDialog" :task-id="finishTarget?.id" :task-title="finishTarget?.title" @finished="load" />
   </main>
 </template>
